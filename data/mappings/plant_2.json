@@ -1,0 +1,7 @@
+{
+  "Production Date": "date",
+  "Shift Code": "shift",
+  "Units Made": "bottles_produced",
+  "Rejects": "defect_count",
+  "Downtime": "downtime_minutes"
+}
