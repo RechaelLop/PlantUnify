@@ -1,61 +1,29 @@
 import streamlit as st
-import pandas as pd
-import os
-import glob
-import plotly.express as px
+from PIL import Image
 
-# --- Load Cleaned Data ---
-def load_cleaned_data():
-    all_files = glob.glob("data/standardized/*.csv")
-    dfs = []
-    for file in all_files:
-        df = pd.read_csv(file)
-        df["plant_id"] = os.path.basename(file).split("_")[0]
-        dfs.append(df)
-    return pd.concat(dfs, ignore_index=True)
+st.set_page_config(page_title="PlantUnify", layout="centered")
 
-# --- Load Data ---
-df = load_cleaned_data()
+# Load logo
+logo = Image.open("assets/plantunify_logo.png")
 
-st.set_page_config(page_title="PlantUnify Dashboard", layout="wide")
-st.title("🏭 PlantUnify – Unified Manufacturing Dashboard")
-
-# --- KPIs ---
-col1, col2, col3 = st.columns(3)
+# Centered layout using columns
+col1, col2, col3 = st.columns([1, 2, 1])
 
 with col1:
-    total_bottles = int(df["bottles_produced"].sum())
-    st.metric("🍼 Total Bottles Produced", f"{total_bottles:,}")
+    st.write("")  # Empty left spacer
 
 with col2:
-    total_defects = int(df["defect_count"].sum())
-    defect_rate = total_defects / total_bottles if total_bottles > 0 else 0
-    st.metric("❌ Defect Rate", f"{defect_rate:.2%}")
+    st.markdown("<div style='margin-top: 80px;'></div>", unsafe_allow_html=True)  # Adds vertical space
+    st.image(logo, width=500)
+
+    st.markdown(
+        "<h1 style='text-align: center; margin-top: 20px;'>PlantUnify</h1>",
+        unsafe_allow_html=True
+    )
+    st.markdown(
+        "<p style='text-align: center; font-size: 16px;'>A Unified Manufacturing Dashboard</p>",
+        unsafe_allow_html=True
+    )
 
 with col3:
-    downtime = int(df["downtime_minutes"].sum())
-    st.metric("🕒 Total Downtime (min)", f"{downtime:,}")
-
-st.markdown("---")
-
-# --- Filters ---
-plant_options = sorted(df["plant_id"].unique())
-selected_plant = st.selectbox("Filter by Plant", options=["All"] + plant_options)
-
-if selected_plant != "All":
-    df = df[df["plant_id"] == selected_plant]
-
-# --- Visuals ---
-st.subheader("📊 Production by Shift")
-fig1 = px.bar(df.groupby("shift")["bottles_produced"].sum().reset_index(),
-              x="shift", y="bottles_produced", color="shift",
-              labels={"bottles_produced": "Bottles Produced"})
-st.plotly_chart(fig1, use_container_width=True)
-
-st.subheader("📉 Defects Over Time")
-fig2 = px.line(df, x="date", y="defect_count", color="plant_id", markers=True)
-st.plotly_chart(fig2, use_container_width=True)
-
-st.subheader("🧮 Raw Data Preview")
-st.dataframe(df)
-
+    st.write("")  # Empty right spacer
